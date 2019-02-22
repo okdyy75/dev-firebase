@@ -115,14 +115,14 @@ rm your choices.
   [create a new project]
 ```
 
-- Hostingの公開ディレクトリ(public)にするか聞かれているので、「dist」にしてEnter
-- SPA（シングルページアプリケーション）として設定（すべてのURLを/index.htmlにアクセス）するか
+1. Hostingの公開ディレクトリ(public)にするか聞かれているので、「dist」にしてEnter
+
+1. SPA（シングルページアプリケーション）として設定（すべてのURLを/index.htmlにアクセス）するか
 聞かれているので、そのままEnter
-- index.htmlを上書きするか聞かれているので「No」でEnter
+
 ```bash
 ? What do you want to use as your public directory? dist
 ? Configure as a single-page app (rewrite all urls to /index.html)? Yes
-? File dist/index.html already exists. Overwrite? No
 ```
 
 Firebaseの初期化が完了
@@ -130,18 +130,15 @@ Firebaseの初期化が完了
 +  Firebase initialization complete!
 ```
 
-ここでgitにコミット
-
-## 作成したFirebaseプロジェクトを公開
-
-各種設定後、Firebaseプロジェクトを一度デプロイ  
-正常に公開されているかHosting URLにアクセス
+firebaseがローカルで動くか確認
 ```
-> npm run build
-> firebase deploy
-```
+> firebase serve
 
-正常にデプロイ出来ていたらOK
+i  hosting: Serving hosting files from: dist
++  hosting: Local server: http://localhost:5000
+
+```
+firebase初期画面が表示されたらOK
 
 # プロジェクトの設定
 
