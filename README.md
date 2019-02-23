@@ -1,17 +1,22 @@
-# dev_firebase
-Firebase開発・検証プロジェクト
+# 概要
+firebaseuiとVue.jsを使ったログイン処理  
+一度ログインしたらログインフォームは非表示にする。  （匿名ログインは除く）  
+匿名ログインは「ゲスト」として表示する。  
+匿名ログイン後、SNSアカウントでログインしたら統合させる。  
 
-# 環境
+## 環境
+- Windows10
 - Node.js　v10.15.0
-- Vue.js　　2.9.6
-- Firebase　6.3.1
+- Vue.js　2.9.6
+- Firebase　6.4.0
 
-# 環境構築
+## 環境構築
 
 事前にPCにインストールされていれば「Vueプロジェクトを作成」までスキップ
 
-## windowsにNode.jsをインストール
-推奨版をインストール  
+### windowsにNode.jsをインストール
+
+推奨版をインストール
 https://nodejs.org/ja/
 
 
@@ -23,23 +28,25 @@ https://qiita.com/strsk/items/925644e124efcc964625
 v10.15.0
 ```
 
-## npmにVue.jsインストール
+### npmにVue.jsインストール
 
-```
+```bash
+
 > npm install -g vue-cli
 
 > vue -V
 2.9.6
 ```
 
-# Vueプロジェクトを作成
+## Vueプロジェクトを作成
 Enter5回、No3回、npmを選択してEnter
+
 ```bash
 > vue init webpack memomemo
 
 ? Project name memomemo
 ? Project description A Vue.js project
-? Author okdyy75 <okdyy75@gmail.com>
+? Author okdyy75 <xxxxx75@gmail.com>
 ? Vue build standalone
 ? Install vue-router? Yes
 ? Use ESLint to lint your code? No
@@ -48,7 +55,8 @@ Enter5回、No3回、npmを選択してEnter
 ? Should we run `npm install` for you after the project has been created? (recommended) npm
 ```
 
-「 To get started」で以下のコマンドを実行
+「 To get started」の以下コマンドを実行
+
 ```bash
 To get started:
 
@@ -57,6 +65,7 @@ To get started:
 ```
 
 vue init 時に作成されたREADME
+
 ``` bash
 # install dependencies
 npm install
@@ -69,34 +78,34 @@ npm run build
 
 # build for production and view the bundle analyzer report
 npm run build --report
-```
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+```
 
+## Firebaseプロジェクトを作成
 
-# Firebaseプロジェクトを作成
-
-Firebaseコンソールからプロジェクトを作成  
+Firebaseコンソールからプロジェクトを作成
 https://console.firebase.google.com/
 
 
 Firebase ツールをインストール
+
 ```bash
 > npm install -g firebase-tools
 ```
 
-Google にログインする
+firebase にログインして、Firebaseプロジェクト作成
+
 ```bash
 > firebase login
-```
+...
 
-Firebaseプロジェクト作成
-```bash
 > firebase init
 ```
 
 どのFirebase CLI機能を使うかSpaceキーを押して選択  
 Hostingを選択してEnter
+
 ```bash
 ? Which Firebase CLI features do you want to setup for this folder? Press Space to select features, then Enter to confi
 rm your choices.
@@ -108,6 +117,7 @@ rm your choices.
 ```
 
 コンソールから作成したプロジェクトを選択
+
 ```bash
 ? Select a default Firebase project for this directory:
   [don't setup a default project]
@@ -118,7 +128,7 @@ rm your choices.
 1. Hostingの公開ディレクトリ(public)にするか聞かれているので、「dist」にしてEnter
 
 1. SPA（シングルページアプリケーション）として設定（すべてのURLを/index.htmlにアクセス）するか
-聞かれているので、そのままEnter
+聞かれているので、「dist」にしてEnter
 
 ```bash
 ? What do you want to use as your public directory? dist
@@ -126,88 +136,342 @@ rm your choices.
 ```
 
 Firebaseの初期化が完了
+
 ```bash
 +  Firebase initialization complete!
 ```
 
 firebaseがローカルで動くか確認
+
 ```
 > firebase serve
 
 i  hosting: Serving hosting files from: dist
 +  hosting: Local server: http://localhost:5000
-
 ```
+
 firebase初期画面が表示されたらOK
 
-# プロジェクトの設定
+## プロジェクトの設定
 
-
-```
-# Vue Routerのインストール
-> npm install vue-router--save
-
+```bash
 # firebaseのインストール
-$ npm install firebase --save
+> npm install firebase --save
 
 # firebase-uiのインストール
 # [FirebaseUI公式リファレンス](https://github.com/firebase/firebaseui-web)
 > npm install firebaseui --save
 
-# firebase-ui日本語化のインストール
+# firebase-ui日本語のインストール
 > npm install firebaseui-ja --save
+```
 
+使用したい場所で下記のように読み込む
+
+```js
+var firebase = require("firebase");
+var firebaseui = require("firebaseui-ja");
+require("firebaseui-ja/dist/firebaseui.css");
+```
+
+## ログイン方法を有効にする
+firebaseコンソールの「Authentication」の「ログイン方法」
+から使用したいSNSを有効にしておく
+
+各SNSデベロッパーサイト
+
+- Facebook
+ - https://developers.facebook.com/
+- twitter
+ - https://developer.twitter.com/en/apps
+- GitHub
+ - https://github.com/settings/developers
+
+## 以下ソース
+
+```html:index.html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>FirebaseUI + vueでログイン</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>
+```
+
+firebaseコンソールの「Authentication」の「ウェブ設定」から
+下記設定を追加  
+
+```js:/src/main.js
+
+import Vue from 'vue'
+import App from './App'
+import router from './router'
+
+Vue.config.productionTip = false
+
+var firebase = require('firebase');
+var config = {
+  apiKey: "xxxxxxxxxxx",
+  authDomain: "xxxx-xxxx.firebaseapp.com",
+  databaseURL: "https://xxxx-xxxx.firebaseio.com",
+  projectId: "xxxx-xxxx",
+  storageBucket: "xxxx-xxxx.appspot.com",
+  messagingSenderId: "xxxxxxxx"
+};
+firebase.initializeApp(config);
+
+```
+
+```js:src/route/index.js
+import Vue from 'vue'
+import Router from 'vue-router'
+import Home from '@/components/Home'
+
+Vue.use(Router)
+
+export default new Router({
+  routes: [
+    {
+      path: '/',
+      name: 'Home',
+      component: Home
+    }
+  ]
+})
+
+```
+
+
+```vuejs:src/components/Home.vue
+<template>
+  <div class="app">
+    <h2>ログインフォーム</h2>
+    <Login v-if="!isLogin || loginUser.displayName == 'ゲスト'"></Login>
+
+    <h2>ログアウトフォーム</h2>
+    <Logout v-if="isLogin" :loginUser="loginUser"></Logout>
+
+    <div v-if="isLogin">
+      <div>{{loginUser.displayName}} さん</div>
+      <div>
+        <img :src="loginUser.photoURL">
+      </div>
+      <div></div>
+    </div>
+  </div>
+</template>
+
+
+<script>
+var firebase = require("firebase");
+import Login from "@/components/Login.vue";
+import Logout from "@/components/Logout.vue";
+
+export default {
+  name: "Index",
+  components: {
+    Login: Login,
+    Logout: Logout
+  },
+  data() {
+    return {
+      isLogin: false,
+      loginUser: null
+    };
+  },
+  beforeRouteEnter(route, redirect, next) {
+    console.log("Home_beforeRouteEnter");
+    firebase.auth().onAuthStateChanged(user => {
+      console.log("onAuthStateChanged", user);
+      next(vm => {
+        var user = firebase.auth().currentUser;
+
+        if (!user) {
+          return;
+        }
+
+        vm.isLogin = true;
+        vm.loginUser = user;
+      });
+    });
+  },
+  beforeRouteUpdate(to, from, next) {
+    console.log("Home_beforeRouteUpdate");
+    vm.isLogin = false;
+    vm.loginUser = null;
+    firebase.auth().onAuthStateChanged(user => {
+      console.log("onAuthStateChanged", user);
+      if (!user) {
+        next();
+        return;
+      }
+      vm.isLogin = true;
+      vm.loginUser = user;
+      next();
+    });
+  }
+};
+</script>
+```
+
+```vuejs:src/components/Login.vue
+<template>
+  <div>
+    <div id="firebaseui-auth-container"></div>
+  </div>
+</template>
+
+<script>
 var firebase = require("firebase");
 var firebaseui = require("firebaseui-ja");
 require("firebaseui-ja/dist/firebaseui.css");
 
-# Vuetifyのインストール
-npm install vuetify --save
+export default {
+  name: "Login",
+  mounted() {
+    console.log("Login_mounted");
+    var vm = this;
+    var ui = new firebaseui.auth.AuthUI(firebase.auth());
+    ui.start("#firebaseui-auth-container", {
+      callbacks: {
+        uiShown: function() {
+          console.log("uiShown");
+        },
+        signInSuccessWithAuthResult: function(authResult, redirectUrl) {
+          console.log("signInSuccessWithAuthResult", authResult, redirectUrl);
 
-# 日付処理ライブラリのインストール
-npm install moment -save
+          var isNewUser = authResult.additionalUserInfo.isNewUser;
+          var displayName = authResult.user.displayName;
+          var photoURL = authResult.user.photoURL;
 
-# マテリアルデザインアイコンのインストール
-# https://github.com/jossef/material-design-icons-iconfont
-npm install material-design-icons-iconfont --save
+          // SNSログイン＆で登録済みであればスキップ
+          if (displayName != "ゲスト" && !isNewUser) {
+            return true;
+          }
 
-# axios
-npm install axios --save
+          switch (authResult.additionalUserInfo.providerId) {
+            case firebase.auth.GoogleAuthProvider.PROVIDER_ID:
+              displayName = authResult.additionalUserInfo.profile.name;
+              photoURL = authResult.additionalUserInfo.profile.picture;
+              break;
+            case firebase.auth.FacebookAuthProvider.PROVIDER_ID:
+              displayName = authResult.additionalUserInfo.profile.name;
+              photoURL = authResult.additionalUserInfo.profile.picture.data.url;
+              break;
+            case firebase.auth.TwitterAuthProvider.PROVIDER_ID:
+              displayName = authResult.additionalUserInfo.profile.name;
+              photoURL =
+                authResult.additionalUserInfo.profile.profile_image_url;
+              break;
+            case firebase.auth.GithubAuthProvider.PROVIDER_ID:
+              displayName = authResult.additionalUserInfo.profile.name;
+              photoURL = authResult.additionalUserInfo.profile.avatar_url;
+              break;
+            default:
+              displayName = "ゲスト";
+              photoURL = "";
+              break;
+          }
 
+          var user = {
+            displayName: displayName,
+            photoURL: photoURL
+          };
 
-コンソールからRealtime Database作成
-npm run build
-npm run build build-js-ja
-npm run build build-npm-ja
+          firebase
+            .auth()
+            .currentUser.updateProfile(user)
+            .then(res => {
+              console.log("Auth登録完了", res);
+              alert("ログインしました。");
+              vm.$router.go();
+            });
+        },
+        signInFailure: function(error) {
+          console.log("signInFailure", error);
+          alert(error.message);
+          vm.$router.go();
+        }
+      },
+      autoUpgradeAnonymousUsers: true,
+      signInFlow: "redirect",
+      signInSuccessUrl: "/",
+      signInOptions: [
+        firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+        firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+        firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+        firebase.auth.GithubAuthProvider.PROVIDER_ID,
+        firebaseui.auth.AnonymousAuthProvider.PROVIDER_ID
+      ]
+    });
+  }
+};
+</script>
+```
 
-build-js-ja build-npm-ja
+```vuejs:src/components/Logout.vue
+<template>
+  <div>
+    <button @click="accountDelete()">アカウント削除</button>
+    <button @click="logout()">ログアウト</button>
+  </div>
+</template>
 
-テストモードで開始
+<script>
+var firebase = require("firebase");
 
-? Are you ready to proceed? Yes
-? Which Firebase CLI features do you want to setup for this folder? Press Space to select features, then Enter to confi
-rm your choices. Database: Deploy Firebase Realtime Database Rules
+export default {
+  name: "Logout",
+  props: ["isLogin", "loginUser"],
+  methods: {
+    // ログアウト
+    logout() {
+      var vm = this;
+      if (!firebase.auth().currentUser) {
+        alert("ログインしてください。");
+        return;
+      }
+      firebase
+        .auth()
+        .signOut()
+        .then(function(res) {
+          console.log("signOut", res);
+          alert("ログアウトしました。");
+          vm.$router.go();
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    },
+    accountDelete() {
+      var vm = this;
+      // アカウント削除
+      if (!firebase.auth().currentUser) {
+        alert("ログインしてください。");
+        return;
+      }
+      firebase
+        .auth()
+        .currentUser.delete()
+        .then(function(res) {
+          console.log("currentUser.delete", res);
+          alert("アカウントを削除しました。");
+          vm.$router.go();
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    }
+  }
+};
+</script>
+```
 
-=== Project Setup
-
-First, let's associate this project directory with a Firebase project.
-You can create multiple project aliases by running firebase use --add,
-but for now we'll just set up a default project.
-
-i  .firebaserc already has a default project, skipping
-
-=== Database Setup
-
-Firebase Realtime Database Rules allow you to define how your data should be
-structured and when your data can be read from and written to.
-
-? What file should be used for Database Rules? database.rules.json
-+  Database Rules for  have been downloaded to database.rules.json.
-Future modifications to database.rules.json will update Database Rules when you run
-firebase deploy.
-
-i  Writing configuration info to firebase.json...
-i  Writing project information to .firebaserc...
-
-+  Firebase initialization complete!
-
+Gitのブランチに上げました
+https://github.com/okdyy75/dev_firebase/tree/firebaseui_vue
