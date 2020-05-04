@@ -1,2 +1,2 @@
-# dev_firebase
-Firebase開発・検証プロジェクト
+# dev-firebase
+Firebase検証用
