@@ -187,6 +187,15 @@ firebaseコンソールの「Authentication」の「ログイン方法」
 - GitHub
  - https://github.com/settings/developers
 
+## ローカル動作確認
+1. 「config/dev.env.js」に環境変数を設定する
+2. `npm run dev`
+
+## 本番デプロイ
+1. 「config/prod.env.js」に環境変数を設定する
+2. `npm run build`
+3. `firebase deploy`
+
 ## 以下ソース
 
 ```html:index.html
@@ -204,27 +213,25 @@ firebaseコンソールの「Authentication」の「ログイン方法」
 </html>
 ```
 
-firebaseコンソールの「Authentication」の「ウェブ設定」から
-下記設定を追加  
-
 ```js:/src/main.js
 
-import Vue from 'vue'
-import App from './App'
-import router from './router'
+import Vue from "vue";
+import App from "@/App.vue";
+import router from "@/router/index";
 
 Vue.config.productionTip = false
 
-var firebase = require('firebase');
-var config = {
-  apiKey: "xxxxxxxxxxx",
-  authDomain: "xxxx-xxxx.firebaseapp.com",
-  databaseURL: "https://xxxx-xxxx.firebaseio.com",
-  projectId: "xxxx-xxxx",
-  storageBucket: "xxxx-xxxx.appspot.com",
-  messagingSenderId: "xxxxxxxx"
-};
-firebase.initializeApp(config);
+import firebase from 'firebase/app';
+firebase.initializeApp(process.env.FIREBASE_CONFIG);
+
+/* eslint-disable no-new */
+new Vue({
+  el: '#app',
+  router,
+  components: { App },
+  template: '<App/>'
+})
+
 
 ```
 
@@ -474,4 +481,4 @@ export default {
 ```
 
 Gitのブランチに上げました
-https://github.com/okdyy75/dev_firebase/tree/firebaseui_vue
+https://github.com/okdyy75/dev-firebase/tree/dev-firebaseui-login
