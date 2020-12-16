@@ -1,7 +1,9 @@
 .DS_Store
-node_modules/
+.firebase/
+config/dev.env.js
+config/prod.env.js
+/node_modules/
 /dist/
-/src/main.js
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -13,4 +15,3 @@ yarn-error.log*
 *.ntvs*
 *.njsproj
 *.sln
-
